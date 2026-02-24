@@ -10,10 +10,11 @@ st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
 st.title("⚡ Pro SEO Internal Linking Tool (V8 - Ultimate Context Shield)")
 
 # Sidebar for API Key
-with if "GROQ_API_KEY" in st.secrets:
-    api_key = st.secrets["GROQ_API_KEY"]
-else:
-    api_key = st.sidebar.text_input("Enter Groq API Key", type="password")
+with st.sidebar:
+    if "GROQ_API_KEY" in st.secrets:
+        api_key = st.secrets["GROQ_API_KEY"]
+    else:
+        api_key = st.text_input("Enter Groq API Key", type="password")
     st.markdown("[Get free Groq API key here](https://console.groq.com/keys)")
 
 # Main Input Fields
