@@ -33,7 +33,7 @@ if st.button("🚀 Generate Perfect Internal Links"):
             st.info("Fetching Sitemap... Please wait.")
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
             response = requests.get(sitemap_url, headers=headers)
-            soup_xml = BeautifulSoup(response.content, 'xml')
+            soup_xml = BeautifulSoup(response.content, 'html.parser')
             all_urls = [loc.text for loc in soup_xml.find_all('loc')]
             
             valid_urls_list = [u for u in all_urls if u.strip('/') != "https://bioactors.online"]
