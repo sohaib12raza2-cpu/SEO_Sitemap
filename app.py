@@ -33,12 +33,8 @@ if st.button("🚀 Generate Perfect Internal Links"):
             st.info("Fetching Sitemap... Please wait.")
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
             response = requests.get(sitemap_url, headers=headers)
-            root = ET.fromstring(response.content)
-            
-            namespaces = {'ns': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
-            all_urls = [elem.text for elem in root.findall('.//ns:loc', namespaces)]
-            if not all_urls:
-                all_urls = [elem.text for elem in root.findall('.//loc')]
+            soup_xml = BeautifulSoup(response.content, 'xml')
+            all_urls = [loc.text for loc in soup_xml.find_all('loc')]
             
             valid_urls_list = [u for u in all_urls if u.strip('/') != "https://bioactors.online"]
                 
@@ -76,11 +72,6 @@ if st.button("🚀 Generate Perfect Internal Links"):
             🚨 CRITICAL RULE (ANTI-SELF-LINKING):
             The main subject of this article is '{main_subject}'. YOU ARE STRICTLY FORBIDDEN from creating any link where the Anchor Text is '{main_subject}'. 
             You MUST actively scan the article for SECONDARY entities (co-stars, spouses, directors, specific movies) that match the available pages.
-
-            CRITICAL RULE: You are an API. Return ONLY valid, perfectly formatted HTML code. 
-DO NOT add any conversational text like "Here is your code". 
-DO NOT wrap the output in markdown code blocks (e.g., no ```html or ```). 
-Your entire output must start directly with the first HTML tag and end with the last HTML tag.
 
             RULES:
             1. Only link if there is a 100% undeniable match for a SECONDARY entity (e.g., Gauri Khan).
