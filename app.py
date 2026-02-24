@@ -15,7 +15,6 @@ with st.sidebar:
         api_key = st.secrets["GROQ_API_KEY"]
     else:
         api_key = st.text_input("Enter Groq API Key", type="password")
-    st.markdown("[Get free Groq API key here](https://console.groq.com/keys)")
 
 # Main Input Fields
 sitemap_url = st.text_input("🌐 Paste Sitemap URL (e.g., https://bioactors.online/sitemap.xml)")
