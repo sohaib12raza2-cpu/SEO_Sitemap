@@ -39,7 +39,9 @@ if st.button("🚀 Generate Perfect Internal Links"):
             valid_urls_list = [u for u in all_urls if u.rstrip('/') != "[https://bioactors.online](https://bioactors.online)"]
             
             if not valid_urls_list:
-                st.error(f"Sitemap properly fetched but 0 URLs extracted. Please verify if '{sitemap_url}' contains <loc> tags.")
+                st.error("Server is playing games! It didn't send the XML. Here is what it actually sent:")
+                # Yeh line server ka kacha chittha (first 1000 characters) screen par dikhayegi
+                st.code(response.text[:1000], language="html")
                 st.stop()
                 
             st.success(f"Found {len(valid_urls_list)} specific pages. Fetching Meta Data...")
