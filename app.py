@@ -25,7 +25,10 @@ if st.button("🚀 Generate Perfect Internal Links"):
         try:
             # 1. Sitemap Fetching (Ultimate Regex)
             st.info("Fetching Sitemap... Please wait.")
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+            headers = {
+    'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+}
             response = requests.get(sitemap_url, headers=headers, timeout=15)
             
             if response.status_code != 200:
@@ -39,9 +42,7 @@ if st.button("🚀 Generate Perfect Internal Links"):
             valid_urls_list = [u for u in all_urls if u.rstrip('/') != "[https://bioactors.online](https://bioactors.online)"]
             
             if not valid_urls_list:
-                st.error("Server is playing games! It didn't send the XML. Here is what it actually sent:")
-                # Yeh line server ka kacha chittha (first 1000 characters) screen par dikhayegi
-                st.code(response.text[:1000], language="html")
+                st.error(f"Sitemap properly fetched but 0 URLs extracted. Please verify if '{sitemap_url}' contains <loc> tags.")
                 st.stop()
                 
             st.success(f"Found {len(valid_urls_list)} specific pages. Fetching Meta Data...")
