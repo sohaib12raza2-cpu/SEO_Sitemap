@@ -77,6 +77,11 @@ if st.button("🚀 Generate Perfect Internal Links"):
             The main subject of this article is '{main_subject}'. YOU ARE STRICTLY FORBIDDEN from creating any link where the Anchor Text is '{main_subject}'. 
             You MUST actively scan the article for SECONDARY entities (co-stars, spouses, directors, specific movies) that match the available pages.
 
+            CRITICAL RULE: You are an API. Return ONLY valid, perfectly formatted HTML code. 
+DO NOT add any conversational text like "Here is your code". 
+DO NOT wrap the output in markdown code blocks (e.g., no ```html or ```). 
+Your entire output must start directly with the first HTML tag and end with the last HTML tag.
+
             RULES:
             1. Only link if there is a 100% undeniable match for a SECONDARY entity (e.g., Gauri Khan).
             2. The "Target URL" MUST be an exact copy-paste from the provided sitemap list.
