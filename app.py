@@ -1,9 +1,9 @@
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
-import xml.etree.ElementTree as ET
 from groq import Groq
 import json
+import re
 
 # App Ka Title Aur Layout
 st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
@@ -18,7 +18,6 @@ with st.sidebar:
 
 # Main Input Fields
 sitemap_url = st.text_input("🌐 Paste Sitemap URL (e.g., https://bioactors.online/sitemap.xml)")
-# NAYA FIELD: Anti-Self-Link Kill Switch
 main_subject = st.text_input("🛑 Main Subject of this Article (e.g., Shah Rukh Khan) - We will strictly BLOCK this name!")
 article_text = st.text_area("📝 Paste Your New Article Here", height=300)
 
@@ -29,14 +28,24 @@ if st.button("🚀 Generate Perfect Internal Links"):
         st.error("Please provide the Sitemap URL, the Main Subject, and the Article text.")
     else:
         try:
-            # 1. Sitemap Fetching
+            # 1. Sitemap Fetching (Regex - Bulletproof Method)
             st.info("Fetching Sitemap... Please wait.")
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
             response = requests.get(sitemap_url, headers=headers)
-            soup_xml = BeautifulSoup(response.content, 'html.parser')
-            all_urls = [loc.text for loc in soup_xml.find_all('loc')]
             
+            if response.status_code != 200:
+                st.error(f"Server blocked the request. Status Code: {response.status_code}")
+                st.stop()
+            
+            # Using Regex to extract URLs bypassing any XML parsing errors
+            all_urls = re.findall(r'<loc>(.*?)</loc>', response.text)
+            
+            # Remove base URL from being internal linked
             valid_urls_list = [u for u in all_urls if u.strip('/') != "https://bioactors.online"]
+            
+            if not valid_urls_list:
+                st.error("Sitemap properly fetched but 0 URLs found. Please check your sitemap link.")
+                st.stop()
                 
             st.success(f"Found {len(valid_urls_list)} specific pages. Fetching Meta Data...")
             
@@ -113,8 +122,12 @@ if st.button("🚀 Generate Perfect Internal Links"):
             elif "```" in raw_response:
                 raw_response = raw_response.split("```")[1].split("```")[0].strip()
                 
-            data = json.loads(raw_response)
-            ai_links = data.get("links", [])
+            try:
+                data = json.loads(raw_response)
+                ai_links = data.get("links", [])
+            except json.JSONDecodeError:
+                st.error("AI returned malformed JSON. Please try generating again.")
+                st.stop()
             
             verified_links = []
             for link in ai_links:
@@ -137,5 +150,4 @@ if st.button("🚀 Generate Perfect Internal Links"):
                 st.warning(f"⚠️ AI scanned everything and successfully ignored '{main_subject}'. However, no other exact matches (like co-stars/movies) were found in your sitemap.")
 
         except Exception as e:
-            st.error(f"Error parsing AI output: {e}")
-            # st.write("Raw AI Output was:", chat_completion.choices[0].message.content)
+            st.error(f"System Error: {e}")
