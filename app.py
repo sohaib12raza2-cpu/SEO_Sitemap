@@ -10,8 +10,7 @@ st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
 st.title("⚡ Pro SEO Internal Linking Tool (V8 - Ultimate Context Shield)")
 
 # Sidebar for API Key
-with # Auto-fetch API key from Streamlit Secrets
-if "GROQ_API_KEY" in st.secrets:
+with if "GROQ_API_KEY" in st.secrets:
     api_key = st.secrets["GROQ_API_KEY"]
 else:
     api_key = st.sidebar.text_input("Enter Groq API Key", type="password")
