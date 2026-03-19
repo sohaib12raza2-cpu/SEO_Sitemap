@@ -68,7 +68,7 @@ if st.button("🚀 Generate Perfect Internal Links"):
             
             # Configuring Gemini to STRICTLY return JSON data
             model = genai.GenerativeModel(
-                'gemini-1.5-flash',
+                'gemini-2.5-flash',
                 generation_config={"response_mime_type": "application/json"}
             )
             
