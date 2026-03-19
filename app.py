@@ -1,49 +1,42 @@
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
-from groq import Groq
+import xml.etree.ElementTree as ET
+import google.generativeai as genai
 import json
-import re
 
+# App Ka Title Aur Layout
 st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
-st.title("⚡ Pro SEO Internal Linking Tool (V9 - The Final Fix)")
+st.title("⚡ Pro SEO Internal Linking Tool (V9 - Gemini Powered)")
 
+# Sidebar for API Key
 with st.sidebar:
-    if "GROQ_API_KEY" in st.secrets:
-        api_key = st.secrets["GROQ_API_KEY"]
+    if "GEMINI_API_KEY" in st.secrets:
+        api_key = st.secrets["GEMINI_API_KEY"]
     else:
-        api_key = st.text_input("Enter Groq API Key", type="password")
+        api_key = st.text_input("Enter Gemini API Key", type="password")
 
-sitemap_url = st.text_input("🌐 Paste Sitemap URL (e.g., [https://bioactors.online/post-sitemap.xml](https://bioactors.online/post-sitemap.xml))")
+# Main Input Fields
+sitemap_url = st.text_input("🌐 Paste Sitemap URL (e.g., https://bioactors.online/sitemap.xml)")
+# NAYA FIELD: Anti-Self-Link Kill Switch
 main_subject = st.text_input("🛑 Main Subject of this Article (e.g., Shah Rukh Khan) - We will strictly BLOCK this name!")
 article_text = st.text_area("📝 Paste Your New Article Here", height=300)
 
 if st.button("🚀 Generate Perfect Internal Links"):
-    if not api_key or not sitemap_url or not article_text or not main_subject:
-        st.error("Please fill all fields.")
+    if not api_key:
+        st.error("Please enter your Gemini API Key in the sidebar settings first.")
+    elif not sitemap_url or not article_text or not main_subject:
+        st.error("Please provide the Sitemap URL, the Main Subject, and the Article text.")
     else:
         try:
-            # 1. Sitemap Fetching (Ultimate Regex)
+            # 1. Sitemap Fetching
             st.info("Fetching Sitemap... Please wait.")
-            headers = {
-    'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-}
-            response = requests.get(sitemap_url, headers=headers, timeout=15)
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            response = requests.get(sitemap_url, headers=headers)
+            soup_xml = BeautifulSoup(response.content, 'html.parser')
+            all_urls = [loc.text for loc in soup_xml.find_all('loc')]
             
-            if response.status_code != 200:
-                st.error(f"Server blocked the request. Status Code: {response.status_code}")
-                st.stop()
-            
-            # Robust Regex to catch URLs even with line breaks or extra spaces in XML
-            raw_urls = re.findall(r'<loc[^>]*>(.*?)</loc>', response.text, re.IGNORECASE | re.DOTALL)
-            all_urls = [u.strip() for u in raw_urls if u.strip()]
-            
-            valid_urls_list = [u for u in all_urls if u.rstrip('/') != "[https://bioactors.online](https://bioactors.online)"]
-            
-            if not valid_urls_list:
-                st.error(f"Sitemap properly fetched but 0 URLs extracted. Please verify if '{sitemap_url}' contains <loc> tags.")
-                st.stop()
+            valid_urls_list = [u for u in all_urls if u.strip('/') != "https://bioactors.online"]
                 
             st.success(f"Found {len(valid_urls_list)} specific pages. Fetching Meta Data...")
             
@@ -52,25 +45,32 @@ if st.button("🚀 Generate Perfect Internal Links"):
             enriched_data = ""
             max_urls = len(valid_urls_list)
             
-            for i, url in enumerate(valid_urls_list):
+            for i in range(max_urls):
+                url = valid_urls_list[i]
                 try:
                     page_resp = requests.get(url, headers=headers, timeout=5)
                     soup = BeautifulSoup(page_resp.content, 'html.parser')
-                    title = soup.title.string.strip() if soup.title and soup.title.string else "No Title"
+                    title = soup.title.string if soup.title else "No Title"
                     
                     meta_desc = soup.find('meta', attrs={'name': 'description'})
-                    desc = meta_desc['content'].strip() if meta_desc and meta_desc.has_attr('content') else "No Description"
+                    desc = meta_desc['content'] if meta_desc else "No Description"
                     
                     enriched_data += f"URL: {url}\nTitle: {title}\nDescription: {desc}\n\n"
-                except Exception:
+                except:
                     enriched_data += f"URL: {url}\nTitle: Error\nDescription: Error\n\n"
                 
                 progress_bar.progress((i + 1) / max_urls)
                 
-            st.success("Meta Data Fetched! Groq AI is scanning for SECONDARY entities... 🧠")
+            st.success("Meta Data Fetched! Gemini AI is scanning for SECONDARY entities... 🧠")
 
-            # 3. Groq AI Call
-            client = Groq(api_key=api_key)
+            # 3. GEMINI AI CALL (Replacing Groq)
+            genai.configure(api_key=api_key)
+            
+            # Configuring Gemini to STRICTLY return JSON data
+            model = genai.GenerativeModel(
+                'gemini-1.5-flash',
+                generation_config={"response_mime_type": "application/json"}
+            )
             
             prompt = f"""
             You are an SEO Internal Linking API. Your job is to find EXACT entity matches between the [AVAILABLE EXISTING PAGES] and the [NEW ARTICLE].
@@ -85,12 +85,13 @@ if st.button("🚀 Generate Perfect Internal Links"):
 
             OUTPUT FORMAT:
             You must respond ONLY with a valid JSON object. Do NOT include markdown formatting or any other text.
+            Example:
             {{
               "links": [
                 {{
                   "Anchor Text": "Gauri Khan",
                   "Found Under Heading": "Personal Life",
-                  "Target URL": "[https://bioactors.online/gauri-khan-biography/](https://bioactors.online/gauri-khan-biography/)",
+                  "Target URL": "https://bioactors.online/gauri-khan-biography/",
                   "Relationship Reason": "Wife of Shah Rukh Khan."
                 }}
               ]
@@ -105,48 +106,41 @@ if st.button("🚀 Generate Perfect Internal Links"):
             {article_text}
             """
             
-            chat_completion = client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt}],
-                model="llama-3.3-70b-versatile",
-                temperature=0.1 # Low temperature for strict JSON formatting
-            )
+            # Sending prompt to Gemini
+            gemini_response = model.generate_content(prompt)
             
-            # 4. JSON Cleaning and Parsing
-            raw_response = chat_completion.choices[0].message.content.strip()
+            # 4. PYTHON GUARDRAILS (The Ultimate Kill-Switch)
+            raw_response = gemini_response.text.strip()
             
-            if raw_response.startswith("```json"):
-                raw_response = raw_response.split("```json")[1]
-            if raw_response.startswith("```"):
-                raw_response = raw_response.split("```")[1]
-            if raw_response.endswith("```"):
-                raw_response = raw_response.rsplit("```", 1)[0]
+            # Fallback cleaning in case Gemini still tries to add markdown
+            if "```json" in raw_response:
+                raw_response = raw_response.split("```json")[1].split("```")[0].strip()
+            elif "```" in raw_response:
+                raw_response = raw_response.split("```")[1].split("```")[0].strip()
                 
-            raw_response = raw_response.strip()
-            
-            try:
-                data = json.loads(raw_response)
-                ai_links = data.get("links", [])
-            except json.JSONDecodeError:
-                st.error("AI returned malformed JSON. Please generate again.")
-                st.stop()
+            data = json.loads(raw_response)
+            ai_links = data.get("links", [])
             
             verified_links = []
             for link in ai_links:
                 suggested_url = link.get("Target URL", "").strip()
                 anchor_text = link.get("Anchor Text", "").strip()
                 
+                # THE KILL SWITCH: If AI still tries to link the main subject, Python will delete it!
                 if main_subject.lower() in anchor_text.lower():
-                    continue 
+                    continue # Skip this loop, block the link
                 
+                # Check if URL is real
                 if suggested_url in valid_urls_list:
                     verified_links.append(link)
             
             # 5. Display the Cleaned Results
-            st.markdown("### 🎉 Verified SEO Internal Links:")
+            st.markdown("### 🎉 Verified SEO Internal Links (Gemini Powered):")
             if verified_links:
                 st.table(verified_links)
             else:
                 st.warning(f"⚠️ AI scanned everything and successfully ignored '{main_subject}'. However, no other exact matches (like co-stars/movies) were found in your sitemap.")
 
         except Exception as e:
-            st.error(f"System Error: {str(e)}")
+            st.error(f"Error parsing AI output: {e}")
+            # st.write("Raw AI Output was:", gemini_response.text)
