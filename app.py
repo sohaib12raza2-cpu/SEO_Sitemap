@@ -9,29 +9,6 @@ import json
 st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
 st.title("⚡ Pro SEO Internal Linking Tool (V10 - Bulletproof Fetcher)")
 
-# --- ULTIMATE BRAND KILLER CSS ---
-hide_st_style = """
-            <style>
-            /* 1. Hide Top Menu & Header */
-            #MainMenu {visibility: hidden !important;}
-            header {visibility: hidden !important;}
-            [data-testid="stHeader"] {display: none !important;}
-            
-            /* 2. Hide Footer, 'Built with Streamlit' badge */
-            footer {visibility: hidden !important; display: none !important;}
-            [data-testid="stFooter"] {display: none !important;}
-            .viewerBadge_container {display: none !important;}
-            
-            /* 3. Hide Toolbar and Fullscreen Button */
-            [data-testid="stToolbar"] {display: none !important;}
-            button[title="View fullscreen"] {display: none !important;}
-            
-            /* 4. Extra force for any floating buttons */
-            .stApp > div:last-child {display: none !important;}
-            </style>
-            """
-st.markdown(hide_st_style, unsafe_allow_html=True)
-
 # Sidebar for API Key
 with st.sidebar:
     if "GEMINI_API_KEY" in st.secrets:
