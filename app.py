@@ -9,20 +9,15 @@ import json
 st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
 st.title("⚡ Pro SEO Internal Linking Tool (V10 - Bulletproof Fetcher)")
 
-# --- HIDE ONLY FULLSCREEN BUTTON & TOP TOOLBAR ---
-hide_fullscreen_style = """
+# --- HIDE TOP MENU & FOOTER ---
+hide_st_style = """
             <style>
-            /* Hide the specific Fullscreen buttons on elements */
-            button[title="View fullscreen"] {
-                display: none !important;
-            }
-            /* Hide the top right toolbar (which also causes redirects) */
-            [data-testid="stToolbar"] {
-                display: none !important;
-            }
+            #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
             </style>
             """
-st.markdown(hide_fullscreen_style, unsafe_allow_html=True)
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
 # Sidebar for API Key
 with st.sidebar:
