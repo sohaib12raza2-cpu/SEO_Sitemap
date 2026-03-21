@@ -9,6 +9,18 @@ import json
 st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
 st.title("⚡ Pro SEO Internal Linking Tool (V10 - Bulletproof Fetcher)")
 
+# --- HIDE STREAMLIT BRANDING & FULLSCREEN BUTTON ---
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            /* Hiding the Fullscreen Button */
+            button[title="View fullscreen"] {display: none !important;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 # Sidebar for API Key
 with st.sidebar:
     if "GEMINI_API_KEY" in st.secrets:
