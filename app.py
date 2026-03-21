@@ -9,13 +9,20 @@ import json
 st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
 st.title("⚡ Pro SEO Internal Linking Tool (V10 - Bulletproof Fetcher)")
 
-# --- HIDE STREAMLIT BRANDING & FULLSCREEN BUTTON ---
+# --- HIDE STREAMLIT BRANDING, BADGES & FULLSCREEN BUTTON ---
 hide_st_style = """
             <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            /* Hiding the Fullscreen Button */
+            /* Hide Default Menus */
+            #MainMenu {visibility: hidden !important;}
+            footer {visibility: hidden !important;}
+            header {visibility: hidden !important;}
+            
+            /* Hide Streamlit Cloud 'Built with Streamlit' Badge */
+            .viewerBadge_container {display: none !important;}
+            .viewerBadge_link {display: none !important;}
+            
+            /* Hide the Toolbar and Fullscreen Button */
+            [data-testid="stToolbar"] {display: none !important;}
             button[title="View fullscreen"] {display: none !important;}
             </style>
             """
