@@ -9,21 +9,25 @@ import json
 st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
 st.title("⚡ Pro SEO Internal Linking Tool (V10 - Bulletproof Fetcher)")
 
-# --- HIDE STREAMLIT BRANDING, BADGES & FULLSCREEN BUTTON ---
+# --- ULTIMATE BRAND KILLER CSS ---
 hide_st_style = """
             <style>
-            /* Hide Default Menus */
+            /* 1. Hide Top Menu & Header */
             #MainMenu {visibility: hidden !important;}
-            footer {visibility: hidden !important;}
             header {visibility: hidden !important;}
+            [data-testid="stHeader"] {display: none !important;}
             
-            /* Hide Streamlit Cloud 'Built with Streamlit' Badge */
+            /* 2. Hide Footer, 'Built with Streamlit' badge */
+            footer {visibility: hidden !important; display: none !important;}
+            [data-testid="stFooter"] {display: none !important;}
             .viewerBadge_container {display: none !important;}
-            .viewerBadge_link {display: none !important;}
             
-            /* Hide the Toolbar and Fullscreen Button */
+            /* 3. Hide Toolbar and Fullscreen Button */
             [data-testid="stToolbar"] {display: none !important;}
             button[title="View fullscreen"] {display: none !important;}
+            
+            /* 4. Extra force for any floating buttons */
+            .stApp > div:last-child {display: none !important;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
