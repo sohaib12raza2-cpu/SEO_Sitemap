@@ -9,16 +9,6 @@ import json
 st.set_page_config(page_title="SEO Internal Linking SaaS", layout="wide")
 st.title("⚡ Pro SEO Internal Linking Tool (V10 - Bulletproof Fetcher)")
 
-# --- HIDE TOP MENU & FOOTER ---
-hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            header {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_st_style, unsafe_allow_html=True)
-
 # Sidebar for API Key
 with st.sidebar:
     if "GEMINI_API_KEY" in st.secrets:
@@ -162,3 +152,6 @@ if st.button("🚀 Generate Perfect Internal Links"):
 
         except Exception as e:
             st.error(f"System Error: {e}")
+
+# --- ADDING EMPTY SPACE AT THE BOTTOM SO RESULTS DON'T GET CUT ---
+st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
